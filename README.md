@@ -27,8 +27,8 @@ dotnet publish -r win-x64 -c Release -o publish -p:PublishReadyToRun=true -p:Pub
 > [Town Of Us is licensed under the GNU General Public License v3.0.](https://github.com/polusgg/Town-Of-Us/blob/master/LICENSE)  
 > [BetterCrewLink is licensed under the GNU General Public License v3.0.](https://github.com/OhMyGuus/BetterCrewLink/blob/nightly/LICENSE)  
 > [SimpleJSON is licensed under the MIT License.](https://github.com/Bunny83/SimpleJSON/blob/master/LICENSE)  
-> [Town Of Imposters doesn't seem to be under any specificied license](https://github.com/Town-of-Impostors/TownOfImpostors)  
-   * [But I've listed it under the same License as BepInEx HERE to avoid confusion of DMCA. I will be happy to fix this in the future if instructed.](https://github.com/EEkebin/kebinImportsMongoose/blob/main/LICENSE_Town-Of-Imposters)**
+> [Town Of Imposters doesn't seem to be under any specificied license](https://github.com/Town-of-Impostors/TownOfImpostors)**
+   * **[But I've listed it under the same License as BepInEx HERE to avoid confusion of DMCA. I will be happy to fix this in the future if instructed.](https://github.com/EEkebin/kebinImportsMongoose/blob/main/LICENSE_Town-Of-Imposters)**
 
 
 ## Disclaimers
