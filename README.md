@@ -1,10 +1,10 @@
 # kebinImportsMongoose
-***This is just an automated installer for Among Us, Town of Us Mod by Polus.gg, and BetterCrewLink.***
+***This is just an automated installer for Among Us, through Steam. Town of Us by polusgg, BetterCrewLink by OhMyGuus.***
 
 
 ## Installation
 
-> ***Literally Just Run it and follow instructions.***
+> ***LITERALLY JUST RUN IT AND FOLLOW INSTRUCTIONS.***
 
 
 ## Build
