@@ -10,7 +10,7 @@
 
 * ***kebinImportsMongoose can only be built with .NET6.0.  
    * This is due to the fact that .NET5.0 gives a seemingly unsolvable class error for WebClient.  
-* If someone can help with this, please do.  
+   * If someone can help with this, please do.  
 > The following command can be used to build kebinImportsMongoose into a single Executable File.  
 ```dosbatch
 dotnet publish -r win-x64 -c Release -o publish -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true
