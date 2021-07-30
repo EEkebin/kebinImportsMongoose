@@ -9,6 +9,6 @@
  ---
 
  ## Credits
- > **polusgg ~ [Town-Of-Us](https://github.com/polusgg/Town-Of-Us)
- > OhMyGuus ~ [BetterCrewLink](https://github.com/OhMyGuus/BetterCrewLink)
- > Bunny83 ~ [SimpleJSON](https://github.com/Bunny83/SimpleJSON)**
+ > **[Town-Of-Us](https://github.com/polusgg/Town-Of-Us)
+ > [BetterCrewLink](https://github.com/OhMyGuus/BetterCrewLink)
+ > [SimpleJSON](https://github.com/Bunny83/SimpleJSON)**
