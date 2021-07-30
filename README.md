@@ -30,4 +30,4 @@ dotnet publish -r win-x64 -c Release -o publish -p:PublishReadyToRun=true -p:Pub
 
 ## Disclaimers
 
-> kebinImportsMongoose is not sponsored by or affiliated with Innersloth LLC, PlayEveryWare, or their affiliates. *Among Us:tm:* is a trademark or registered trademark of Innersloth LLC, PlayEveryWare, and/or its affiliates in the U.S. and elsewhere.
+> kebinImportsMongoose is not sponsored by or affiliated with Innersloth LLC, PlayEveryWare, or their affiliates. "Among Us" is a trademark or registered trademark of Innersloth LLC, PlayEveryWare, and/or its affiliates in the U.S. and elsewhere.
