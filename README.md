@@ -4,8 +4,8 @@
 
 ## Installation
 
-> ***LITERALLY JUST RUN IT AND FOLLOW INSTRUCTIONS.***
-
+> ***LITERALLY JUST RUN IT AND FOLLOW INSTRUCTIONS.***  
+> **Yes, you must own the game through Steam for this to work.**
 
 ## Build
 
