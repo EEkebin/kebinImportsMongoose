@@ -33,8 +33,8 @@ dotnet publish -r win-x64 -c Release -o publish -p:PublishReadyToRun=true -p:Pub
 
 > kebinImportsMongoose is not sponsored by or affiliated with Valve or its affiliates. "Steam" is a trademark or registered trademark of Valve and/or its affiliates in the U.S. and elsewhere.
 
-> kebinImportsMongoose is not responsible for any of the actions committed by its dependencies.  
+> kebinImportsMongoose and its credited persons are not responsible for any of the actions committed by its dependencies.  
 
 > kebinImportsMongoose and its credited persons do not intend any misuse of itself nor its dependencies.  
 
-> kebinImportsMongoose will not assume the role of fixing it's dependencies issues and reserves the right to terminate functionality through its credited
+> kebinImportsMongoose will not assume the role of fixing its dependencies issues and reserves the right to terminate functionality through its credited persons authority.
