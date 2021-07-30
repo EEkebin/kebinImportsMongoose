@@ -22,7 +22,8 @@ dotnet publish -r win-x64 -c Release -o publish -p:PublishReadyToRun=true -p:Pub
 
 ## Licenses
 
-> **[Town Of Us is licensed under the GNU General Public License v3.0.](https://github.com/polusgg/Town-Of-Us/blob/master/LICENSE)  
+> **[kebinImportsMongoose](https://github.com/EEkebin/kebinImportsMongoose/blob/main/LICENSE)  
+> [Town Of Us is licensed under the GNU General Public License v3.0.](https://github.com/polusgg/Town-Of-Us/blob/master/LICENSE)  
 > [BetterCrewLink is licensed under the GNU General Public License v3.0.](https://github.com/OhMyGuus/BetterCrewLink/blob/nightly/LICENSE)  
 > [SimpleJSON is licensed under the MIT License.](https://github.com/Bunny83/SimpleJSON/blob/master/LICENSE)**
 
