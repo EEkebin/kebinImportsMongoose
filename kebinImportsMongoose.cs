@@ -51,7 +51,7 @@ class kebinImportsMongoose
         JSONNode jsonNode;
         string csteamappsDir = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86).ToString().Trim() + @"/Steam/steamapps/";
         string amongUsDirectory = "";
-        if (File.Exists(csteamappsDir + "libraryfolders.vdf"))
+        if (File.Exists(csteamappsDir + "libraryfolders.vdf") || !Directory.Exists(amongUsDirectory))
         {
             string code = VDFToString(csteamappsDir + "libraryfolders.vdf");
             jsonNode = JSON.Parse(code);
@@ -63,7 +63,7 @@ class kebinImportsMongoose
                     amongUsDirectory = gamesDirs + @"/steamapps/common/Among Us";
                 }
             }
-            if (amongUsDirectory == "") amongUsDirectory = csteamappsDir + @"/common/Among Us/";
+            if (amongUsDirectory == ""  || !Directory.Exists(amongUsDirectory)) amongUsDirectory = csteamappsDir + @"/common/Among Us/";
 
         }
         string appDataLocalDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).ToString().Trim();
@@ -78,8 +78,14 @@ class kebinImportsMongoose
             UseShellExecute = true
         };
         Console.Title = "kebinImportsMongoose";
-        Console.WriteLine("\nBrought to you by kebin#9844.\n\n\nThis program will:\n1. Install Among Us, assuming you have it purchased and it is not installed already.\n2. Install Latest Town Of Us or Town Of Imposters Mod.\n3. If not installed, install BetterCrewLink.");
-        Console.WriteLine("If you get any errors, and you have already tried disabling your antivirus software, please contact kebin#9844.\n\n");
+        Console.ForegroundColor = ConsoleColor.DarkCyan;
+        Console.WriteLine("\nBrought to you by kebin#9844.");
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("\n\nThis program will:\n-------------------");
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine("1. Install Among Us, assuming you have it purchased and it is not installed already.\n2. Install Latest Town Of Us or Town Of Imposters Mod.\n3. If not installed, install BetterCrewLink.");
+        Console.ForegroundColor = ConsoleColor.DarkCyan;
+        Console.WriteLine("\nIf you get any errors, and you have already tried disabling your antivirus software, please contact kebin#9844.\n\n");
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("PLEASE FOLLOW THE INSTRUCTIONS!\n\n");
         Console.ResetColor();
@@ -96,7 +102,7 @@ class kebinImportsMongoose
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.Write("\n\nType \"y\" when Among Us is completely uninstalled> ");
         Console.ResetColor();
-        while (Console.ReadLine() != "y") ;
+        while (Console.ReadLine().ToLower() != "y") ;
         if (Directory.Exists(amongUsDirectory)) Directory.Delete(amongUsDirectory, true);
         url = "steam://install/945360";
         psi.FileName = url;
@@ -108,15 +114,43 @@ class kebinImportsMongoose
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.Write("\n\nType \"y\" when Among Us is done installing > ");
         Console.ResetColor();
-        while (Console.ReadLine() != "y") ;
-        System.IO.DirectoryInfo di = new DirectoryInfo(amongUsDirectory);
-        foreach (FileInfo file in di.GetFiles())
+        while (Console.ReadLine().ToLower() != "y") ;
+        if (File.Exists(csteamappsDir + "libraryfolders.vdf") || !Directory.Exists(amongUsDirectory))
         {
-            file.Delete();
+            string code = VDFToString(csteamappsDir + "libraryfolders.vdf");
+            jsonNode = JSON.Parse(code);
+            for (int i = 1; i < jsonNode.Count; i++)
+            {
+                string gamesDirs = jsonNode[i]["path"];
+                if (Directory.Exists(gamesDirs + @"/steamapps/common/Among Us"))
+                {
+                    amongUsDirectory = gamesDirs + @"/steamapps/common/Among Us";
+                }
+            }
+            if (amongUsDirectory == ""  || !Directory.Exists(amongUsDirectory)) amongUsDirectory = csteamappsDir + @"/common/Among Us/";
+
         }
-        foreach (DirectoryInfo dir in di.GetDirectories())
+        if (Directory.Exists(amongUsDirectory))
         {
-            dir.Delete(true);
+            System.IO.DirectoryInfo di = new DirectoryInfo(amongUsDirectory);
+            foreach (FileInfo file in di.GetFiles())
+            {
+                file.Delete();
+            }
+            foreach (DirectoryInfo dir in di.GetDirectories())
+            {
+                dir.Delete(true);
+            }
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("The Among Us installation was not found on any disk that Steam can see.\n");
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("Perhaps you skipped the installation step. Please follow the instructions.");
+            Console.ResetColor();
+            Thread.Sleep(3000);
+            Environment.Exit(1);
         }
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("\n\nWhich mod would you like to install?\n-------------------------------------");
@@ -164,6 +198,7 @@ class kebinImportsMongoose
         }
         client.DownloadFile(downloadLink, downloadDir + @"MOD.zip");
         ZipFile.ExtractToDirectory(downloadDir + @"MOD.zip", amongUsDirectory);
+        Thread.Sleep(2000);
         url = "steam://validate/945360";
         psi.FileName = url;
         Console.ForegroundColor = ConsoleColor.Green;
@@ -208,9 +243,8 @@ class kebinImportsMongoose
         Thread.Sleep(3000);
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("\n\nThanks for using kebin's AutoModInstaller for Among Us, Town Of Us or Town Of Imposters, and BetterCrewLink.\nShow him support by being nice! :'(");
-        Console.ForegroundColor = ConsoleColor.DarkYellow;
-        Console.WriteLine("\nPress any key to exit ...");
         Console.ResetColor();
+        Console.WriteLine("\nPress any key to exit ...");
         Console.ReadKey();
     }
 }
