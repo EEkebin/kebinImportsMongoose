@@ -9,20 +9,10 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.RegularExpressions;
 using SimpleJSON;
+using nWeb;
 
 class kebinImportsMongoose
 {
-    public class newWebClient : WebClient
-    {
-        protected override WebResponse GetWebResponse(WebRequest request)
-        {
-            (request as HttpWebRequest).AllowAutoRedirect = true;
-            (request as HttpWebRequest).UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246";
-            WebResponse response = base.GetWebResponse(request);
-            return response;
-        }
-    }
-
     // A VERY primitive and single use-case method of converting a Valve Data File type string to JSON type string.
     // NOT recommended for use anywhere else. Made painstaingly by kebin#9844.
     static string VDFToString(string dir)
@@ -47,6 +37,8 @@ class kebinImportsMongoose
 
     static void Main(string[] args)
     {
+        Console.Title = "kebinImportsMongoose";
+        Console.Clear();
         newWebClient client = new newWebClient();
         JSONNode jsonNode;
         string csteamappsDir = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86).ToString().Trim() + @"/Steam/steamapps/";
@@ -58,18 +50,17 @@ class kebinImportsMongoose
             for (int i = 1; i < jsonNode.Count; i++)
             {
                 string gamesDirs = jsonNode[i]["path"];
-                if (Directory.Exists(gamesDirs + @"/steamapps/common/Among Us"))
+                if (Directory.Exists(gamesDirs + @"/steamapps/common/Among Us/"))
                 {
-                    amongUsDirectory = gamesDirs + @"/steamapps/common/Among Us";
+                    amongUsDirectory = gamesDirs + @"/steamapps/common/Among Us/";
                 }
             }
             if (amongUsDirectory == ""  || !Directory.Exists(amongUsDirectory)) amongUsDirectory = csteamappsDir + @"/common/Among Us/";
 
         }
         string appDataLocalDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).ToString().Trim();
-        if (Directory.Exists(appDataLocalDir + @"/Temp/kebinImportsMongoose/")) Directory.Delete(appDataLocalDir + @"/Temp/kebinImportsMongoose/", true);
-        Directory.CreateDirectory(appDataLocalDir + @"/Temp/kebinImportsMongoose/");
-        string downloadDir = appDataLocalDir + @"/Temp/kebinImportsMongoose/";
+        string kebinImportsMongooseDownloadsDir = appDataLocalDir + @"/Temp/kebinImportsMongoose/Downloads/";
+        if (Directory.Exists(kebinImportsMongooseDownloadsDir)) Directory.Delete(kebinImportsMongooseDownloadsDir, true);
         string appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString().Trim();
         string bclDir = appDataLocalDir + "/Programs/bettercrewlink/";
         string downloadLink = "";
@@ -77,7 +68,6 @@ class kebinImportsMongoose
         {
             UseShellExecute = true
         };
-        Console.Title = "kebinImportsMongoose";
         Console.ForegroundColor = ConsoleColor.DarkCyan;
         Console.WriteLine("\nBrought to you by kebin#9844.");
         Console.ForegroundColor = ConsoleColor.Green;
@@ -122,9 +112,9 @@ class kebinImportsMongoose
             for (int i = 1; i < jsonNode.Count; i++)
             {
                 string gamesDirs = jsonNode[i]["path"];
-                if (Directory.Exists(gamesDirs + @"/steamapps/common/Among Us"))
+                if (Directory.Exists(gamesDirs + @"/steamapps/common/Among Us/"))
                 {
-                    amongUsDirectory = gamesDirs + @"/steamapps/common/Among Us";
+                    amongUsDirectory = gamesDirs + @"/steamapps/common/Among Us/";
                 }
             }
             if (amongUsDirectory == ""  || !Directory.Exists(amongUsDirectory)) amongUsDirectory = csteamappsDir + @"/common/Among Us/";
@@ -196,8 +186,9 @@ class kebinImportsMongoose
                 }
             }
         }
-        client.DownloadFile(downloadLink, downloadDir + @"MOD.zip");
-        ZipFile.ExtractToDirectory(downloadDir + @"MOD.zip", amongUsDirectory);
+        Directory.CreateDirectory(kebinImportsMongooseDownloadsDir);
+        client.DownloadFile(downloadLink, kebinImportsMongooseDownloadsDir + @"MOD.zip");
+        ZipFile.ExtractToDirectory(kebinImportsMongooseDownloadsDir + @"MOD.zip", amongUsDirectory);
         Thread.Sleep(2000);
         url = "steam://validate/945360";
         psi.FileName = url;
@@ -226,9 +217,9 @@ class kebinImportsMongoose
                     downloadLink = jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"');
                 }
             }
-            client.DownloadFile(downloadLink, downloadDir + @"BCL.exe");
+            client.DownloadFile(downloadLink, kebinImportsMongooseDownloadsDir + @"BCL.exe");
             startInfo.FileName = startInfo.FileName = "powershell.exe";
-            startInfo.Arguments = downloadDir + @".\\BCL.exe";
+            startInfo.Arguments = kebinImportsMongooseDownloadsDir + @".\\BCL.exe";
         }
         else
         {
