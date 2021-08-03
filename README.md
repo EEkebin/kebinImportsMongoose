@@ -26,6 +26,7 @@ dotnet publish -r win-x64 -c Release -o publish -p:PublishReadyToRun=true -p:Pub
 > **[kebinImportsMongoose is licened under the GNU General Public License v3.0.](https://github.com/EEkebin/kebinImportsMongoose/blob/main/LICENSE)  
 > [BepInEx is licensed under the GNU Lesser General Public License v2.1.](https://github.com/BepInEx/BepInEx/blob/master/LICENSE)  
 > [Town Of Us is licensed under the GNU General Public License v3.0.](https://github.com/polusgg/Town-Of-Us/blob/master/LICENSE)  
+> [The Other Roles is licensed under the GNU General Public License v3.0.](https://github.com/Eisbison/TheOtherRoles/blob/main/LICENSE)  
 > [BetterCrewLink is licensed under the GNU General Public License v3.0.](https://github.com/OhMyGuus/BetterCrewLink/blob/nightly/LICENSE)  
 > [SimpleJSON is licensed under the MIT License.](https://github.com/Bunny83/SimpleJSON/blob/master/LICENSE)  
 > [Town Of Imposters doesn't seem to be under any specificied license](https://github.com/Town-of-Impostors/TownOfImpostors)**

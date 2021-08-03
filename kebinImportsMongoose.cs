@@ -145,7 +145,7 @@ class kebinImportsMongoose
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("\n\nWhich mod would you like to install?\n-------------------------------------");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
-        Console.WriteLine("1. Town Of Us\n2. Town Of Imposters\n");
+        Console.WriteLine("1. Town Of Us\n2. Town Of Imposters\n3. The Other Roles\n");
         Console.ForegroundColor = ConsoleColor.Green;
         Console.Write("Please input the corresponding number with the mod you would like to install. > ");
         Console.ResetColor();
@@ -157,7 +157,7 @@ class kebinImportsMongoose
             {
                 selectedModString = Console.ReadLine();
             } while (Int32.TryParse(selectedModString, out selectedMod) == false);
-        } while (selectedMod != 1 && selectedMod != 2);
+        } while (selectedMod < 1 && selectedMod > 3);
         if (selectedMod == 1)
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -178,6 +178,20 @@ class kebinImportsMongoose
             Console.WriteLine("\n\nInstalling Town Of Imposters.");
             Console.ResetColor();
             jsonNode = SimpleJSON.JSON.Parse(client.DownloadString("https://api.github.com/repos/Town-of-Impostors/TownOfImpostors/releases/latest"));
+            for (int i = 0; i < jsonNode["assets"].Count; i++)
+            {
+                if (jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"').EndsWith(".zip"))
+                {
+                    downloadLink = jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"');
+                }
+            }
+        }
+        else if (selectedMod == 3)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\n\nInstalling The Other Roles.");
+            Console.ResetColor();
+            jsonNode = SimpleJSON.JSON.Parse(client.DownloadString("https://api.github.com/repos/Eisbison/TheOtherRoles/releases/latest"));
             for (int i = 0; i < jsonNode["assets"].Count; i++)
             {
                 if (jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"').EndsWith(".zip"))
