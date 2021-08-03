@@ -157,7 +157,7 @@ class kebinImportsMongoose
             {
                 selectedModString = Console.ReadLine();
             } while (Int32.TryParse(selectedModString, out selectedMod) == false);
-        } while (selectedMod < 1 && selectedMod > 3);
+        } while (selectedMod < 1 || selectedMod > 3);
         if (selectedMod == 1)
         {
             Console.ForegroundColor = ConsoleColor.Green;
