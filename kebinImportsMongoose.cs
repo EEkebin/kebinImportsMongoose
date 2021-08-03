@@ -73,7 +73,7 @@ class kebinImportsMongoose
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("\n\nThis program will:\n-------------------");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
-        Console.WriteLine("1. Install Among Us, assuming you have it purchased and it is not installed already.\n2. Install Latest Town Of Us or Town Of Imposters Mod.\n3. If not installed, install BetterCrewLink.");
+        Console.WriteLine("1. Install Among Us, assuming you have it purchased and it is not installed already.\n2. Install Latest Town Of Us, Town Of Imposters, or The Other Roles mod.\n3. If not installed, install BetterCrewLink.");
         Console.ForegroundColor = ConsoleColor.DarkCyan;
         Console.WriteLine("\nIf you get any errors, and you have already tried disabling your antivirus software, please contact kebin#9844.\n\n");
         Console.ForegroundColor = ConsoleColor.Red;
