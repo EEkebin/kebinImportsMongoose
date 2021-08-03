@@ -1,6 +1,6 @@
 # kebinImportsMongoose
 
-***This is just an automated installer for Among Us, through Steam. Town of Us by polusgg, BetterCrewLink by OhMyGuus.***
+***This is just an automated installer for Among Us, through Steam. Town of Us by polusgg, The Other Roles by Eisbison, Town of Imposters, and BetterCrewLink by OhMyGuus.***
 > **Yes, you must own the game through Steam for this to work.**
 
 ## Installation
