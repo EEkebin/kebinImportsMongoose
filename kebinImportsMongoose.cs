@@ -2,50 +2,54 @@
 
 using System;
 using System.IO;
-using System.Net;
-using System.Linq;
 using System.Threading;
 using System.IO.Compression;
-using System.Text;
-using System.Text.RegularExpressions;
 using SimpleJSON;
 using nWeb;
+using VDF2STR;
+using LNK2Path;
 
 class kebinImportsMongoose
 {
-    // A VERY primitive and single use-case method of converting a Valve Data File type string to JSON type string.
-    // NOT recommended for use anywhere else. Made painstaingly by kebin#9844.
-    static string VDFToString(string dir)
-    {
-        string[] allLines = File.ReadAllLines(dir);
-        allLines = allLines.Skip(1).ToArray();
-        string code = "";
-        for (int i = 0; i < allLines.Length; i++) code += allLines[i] + "\n";
-        while (code.Contains("\"\t\t")) code = code.Replace("\"\t\t", "\": ");
-        while (code.Contains("\"\n")) code = code.Replace("\"\n", "\",\n");
-        Regex pattern = new Regex("\t\"[\\d]+\",");
-        MatchCollection matches = pattern.Matches(code);
-        for (int i = 0; i < matches.Count; i++)
-        {
-            int indexOfMatch = matches.ElementAt(i).Index;
-            int lengthOfMatch = matches.ElementAt(i).Length;
-            int nextChar = indexOfMatch + lengthOfMatch - 1;
-            code = new StringBuilder(code) { [nextChar] = ':' }.ToString();
-        }
-        return code;
-    }
-
     static void Main(string[] args)
     {
         Console.Title = "kebinImportsMongoose";
         Console.Clear();
         newWebClient client = new newWebClient();
         JSONNode jsonNode;
-        string csteamappsDir = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86).ToString().Trim() + @"/Steam/steamapps/";
-        string amongUsDirectory = "";
-        if (File.Exists(csteamappsDir + "libraryfolders.vdf") || !Directory.Exists(amongUsDirectory))
+        string appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString().Trim();
+        string appDataLocalDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).ToString().Trim();
+        string startUpFolder1 = Environment.GetFolderPath(Environment.SpecialFolder.Programs) + @"/Steam/";
+        string startUpFolder2 = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"/Steam/";
+        string amongUsDirectory = "", steamDir = "", steamappsDir = "";
+        if ((Directory.Exists(startUpFolder1) && !Directory.Exists(startUpFolder2)) || (Directory.Exists(startUpFolder1) && Directory.Exists(startUpFolder2)))
         {
-            string code = VDFToString(csteamappsDir + "libraryfolders.vdf");
+            if (File.Exists(startUpFolder1 + @"/Steam.lnk"))
+            {
+                steamDir = LNK2PATH.GetShortcutTarget(startUpFolder1 + @"/Steam.lnk").Replace("steam.exe", "");
+            }
+            else if (steamDir == "" && File.Exists(startUpFolder2 + @"/Steam.lnk"))
+            {
+                steamDir = LNK2PATH.GetShortcutTarget(startUpFolder2 + @"/Steam.lnk").Replace("steam.exe", "");
+            }
+        }
+        else if ((!Directory.Exists(startUpFolder1) && Directory.Exists(startUpFolder2)) && steamDir == "")
+        {
+            if (File.Exists(startUpFolder2 + @"/Steam.lnk"))
+            {
+                steamDir = LNK2PATH.GetShortcutTarget(startUpFolder2 + @"/Steam.lnk").Replace("steam.exe", "");
+            }
+        }
+        if (steamDir == "" || !File.Exists(steamDir + @"/steam.exe"))
+        {
+            Console.WriteLine("Steam has not been found by kebinImports. Either it is not installed or this is a bug. Please let kebin#9844 know.");
+            Console.ReadKey();
+            Environment.Exit(2);
+        }
+        steamappsDir = steamDir + @"/steamapps/";
+        if (File.Exists(steamappsDir + "libraryfolders.vdf") || !Directory.Exists(amongUsDirectory))
+        {
+            string code = VDFToString.Convert(steamappsDir + "libraryfolders.vdf");
             jsonNode = JSON.Parse(code);
             for (int i = 1; i < jsonNode.Count; i++)
             {
@@ -55,13 +59,11 @@ class kebinImportsMongoose
                     amongUsDirectory = gamesDirs + @"/steamapps/common/Among Us/";
                 }
             }
-            if (amongUsDirectory == ""  || !Directory.Exists(amongUsDirectory)) amongUsDirectory = csteamappsDir + @"/common/Among Us/";
+            if (amongUsDirectory == "" || !Directory.Exists(amongUsDirectory)) amongUsDirectory = steamappsDir + @"/common/Among Us/";
 
         }
-        string appDataLocalDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).ToString().Trim();
         string kebinImportsMongooseDownloadsDir = appDataLocalDir + @"/Temp/kebinImportsMongoose/Downloads/";
         if (Directory.Exists(kebinImportsMongooseDownloadsDir)) Directory.Delete(kebinImportsMongooseDownloadsDir, true);
-        string appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString().Trim();
         string bclDir = appDataLocalDir + "/Programs/bettercrewlink/";
         string downloadLink = "";
         var psi = new System.Diagnostics.ProcessStartInfo
@@ -105,9 +107,9 @@ class kebinImportsMongoose
         Console.Write("\n\nType \"y\" when Among Us is done installing > ");
         Console.ResetColor();
         while (Console.ReadLine().ToLower() != "y") ;
-        if (File.Exists(csteamappsDir + "libraryfolders.vdf") || !Directory.Exists(amongUsDirectory))
+        if (File.Exists(steamappsDir + "libraryfolders.vdf") || !Directory.Exists(amongUsDirectory))
         {
-            string code = VDFToString(csteamappsDir + "libraryfolders.vdf");
+            string code = VDFToString.Convert(steamappsDir + "libraryfolders.vdf");
             jsonNode = JSON.Parse(code);
             for (int i = 1; i < jsonNode.Count; i++)
             {
@@ -117,7 +119,7 @@ class kebinImportsMongoose
                     amongUsDirectory = gamesDirs + @"/steamapps/common/Among Us/";
                 }
             }
-            if (amongUsDirectory == ""  || !Directory.Exists(amongUsDirectory)) amongUsDirectory = csteamappsDir + @"/common/Among Us/";
+            if (amongUsDirectory == "" || !Directory.Exists(amongUsDirectory)) amongUsDirectory = steamappsDir + @"/common/Among Us/";
 
         }
         if (Directory.Exists(amongUsDirectory))
