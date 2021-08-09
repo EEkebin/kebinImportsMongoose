@@ -1,4 +1,4 @@
-﻿// Discord: kebin#9844.
+// Discord: kebin#9844.
 
 using System;
 using System.IO;
@@ -8,17 +8,51 @@ using SimpleJSON;
 using nWeb;
 using VDF2STR;
 using LNK2Path;
+using static semver.CompareVersions;
 
 class kebinImportsMongoose
 {
+    private static string version = "2.1.0";
     static void Main(string[] args)
     {
         Console.Title = "kebinImportsMongoose";
         Console.Clear();
+        Console.ForegroundColor = ConsoleColor.DarkCyan;
+        Console.WriteLine("\nBrought to you by kebin#9844.");
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("\n\nThis program will:\n-------------------");
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine("1. Install Among Us, assuming you have it purchased and it is not installed already.\n2. Install Latest Town Of Us, Town Of Imposters, or The Other Roles mod.\n3. If not installed, install BetterCrewLink.");
+        Console.ForegroundColor = ConsoleColor.DarkCyan;
+        Console.WriteLine("\nIf you get any errors, and you have already tried disabling your antivirus software, please contact kebin#9844.\n\n");
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("PLEASE FOLLOW THE INSTRUCTIONS!\n\n");
+        Console.ResetColor();
         newWebClient client = new newWebClient();
         JSONNode jsonNode;
+        System.Diagnostics.Process process = new System.Diagnostics.Process();
+        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+        startInfo.FileName = "powershell.exe";
         string appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString().Trim();
         string appDataLocalDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).ToString().Trim();
+        string kebinImportsMongooseDir = appDataLocalDir + @"/Temp/kebinImportsMongoose/";
+        string kebinImportsMongooseInstallerDir = appDataLocalDir + @"/Temp/kebinImportsMongoose/Installer/";
+        if (Directory.Exists(kebinImportsMongooseDir)) Directory.Delete(kebinImportsMongooseDir, true);
+        Directory.CreateDirectory(kebinImportsMongooseInstallerDir);
+        jsonNode = SimpleJSON.JSON.Parse(client.DownloadString("https://api.github.com/repos/EEkebin/kebinImportsMongoose/releases/latest"));
+        if (compareVersions(version, jsonNode["tag_name"]) == 1)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\nUpdating kebinImportsMongoose");
+            Console.ResetColor();
+            client.DownloadFile(@"https://github.com/EEkebin/kebinImportsMongoose/releases/latest/download/kebinImportsMongoose.exe", kebinImportsMongooseInstallerDir + @"kebinImportsMongoose.exe");
+            startInfo.Arguments = @"start '" + kebinImportsMongooseInstallerDir + @".\\kebinImportsMongoose.exe'";
+            process.StartInfo = startInfo;
+            Thread.Sleep(1000);
+            process.Start();
+            Environment.Exit(-1);
+        }
         string startUpFolder1 = Environment.GetFolderPath(Environment.SpecialFolder.Programs) + @"/Steam/";
         string startUpFolder2 = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"/Steam/";
         string amongUsDirectory = "", steamDir = "", steamappsDir = "";
@@ -70,17 +104,6 @@ class kebinImportsMongoose
         {
             UseShellExecute = true
         };
-        Console.ForegroundColor = ConsoleColor.DarkCyan;
-        Console.WriteLine("\nBrought to you by kebin#9844.");
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("\n\nThis program will:\n-------------------");
-        Console.ForegroundColor = ConsoleColor.DarkYellow;
-        Console.WriteLine("1. Install Among Us, assuming you have it purchased and it is not installed already.\n2. Install Latest Town Of Us, Town Of Imposters, or The Other Roles mod.\n3. If not installed, install BetterCrewLink.");
-        Console.ForegroundColor = ConsoleColor.DarkCyan;
-        Console.WriteLine("\nIf you get any errors, and you have already tried disabling your antivirus software, please contact kebin#9844.\n\n");
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("PLEASE FOLLOW THE INSTRUCTIONS!\n\n");
-        Console.ResetColor();
         Console.WriteLine("Press any key to continue ...");
         Console.ReadKey();
         Console.Clear();
@@ -103,6 +126,7 @@ class kebinImportsMongoose
         Console.ResetColor();
         Thread.Sleep(1000);
         System.Diagnostics.Process.Start(psi);
+        Thread.Sleep(5000);
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.Write("\n\nType \"y\" when Among Us is done installing > ");
         Console.ResetColor();
@@ -211,10 +235,8 @@ class kebinImportsMongoose
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("\n\nVerifying Integrity of Among Us.");
         Console.ResetColor();
-        Thread.Sleep(1000);
+        Thread.Sleep(2000);
         System.Diagnostics.Process.Start(psi);
-        System.Diagnostics.Process process = new System.Diagnostics.Process();
-        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
         startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
         if (!Directory.Exists(bclDir))
         {
@@ -234,16 +256,14 @@ class kebinImportsMongoose
                 }
             }
             client.DownloadFile(downloadLink, kebinImportsMongooseDownloadsDir + @"BCL.exe");
-            startInfo.FileName = startInfo.FileName = "powershell.exe";
-            startInfo.Arguments = kebinImportsMongooseDownloadsDir + @".\\BCL.exe";
+            startInfo.Arguments = @"start '" + kebinImportsMongooseDownloadsDir + @".\\BCL.exe'";
         }
         else
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Launching Better-CrewLink.");
             Console.ResetColor();
-            startInfo.FileName = "powershell.exe";
-            startInfo.Arguments = bclDir + @".\\Better-CrewLink.exe";
+            startInfo.Arguments = @"start '" + bclDir + @".\\Better-CrewLink.exe'";
         }
         process.StartInfo = startInfo;
         process.Start();
