@@ -12,7 +12,7 @@ using static semver.CompareVersions;
 
 class kebinImportsMongoose
 {
-    private static string version = "2.1.0";
+    private static string version = "2.0.0";
     static void Main(string[] args)
     {
         Console.Title = "kebinImportsMongoose";
