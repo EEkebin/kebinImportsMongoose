@@ -1,3 +1,5 @@
+# This project is now dead, as I am not the greatest C# programmer. I'm not the best at parsing files, or creating conditions.
+
 # kebinImportsMongoose
 
 ***This is just an automated installer for Among Us, through Steam. Town of Us by polusgg, The Other Roles by Eisbison, Town of Imposters, and BetterCrewLink by OhMyGuus.***
