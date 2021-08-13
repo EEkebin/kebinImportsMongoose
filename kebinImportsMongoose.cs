@@ -12,7 +12,7 @@ using static semver.CompareVersions;
 
 class kebinImportsMongoose
 {
-    private static string version = "2.0.0";
+    private static string version = "2.0.1";
     static void Main(string[] args)
     {
         Console.Title = "kebinImportsMongoose";
@@ -54,7 +54,7 @@ class kebinImportsMongoose
             Environment.Exit(-1);
         }
         string startUpFolder1 = Environment.GetFolderPath(Environment.SpecialFolder.Programs) + @"/Steam/";
-        string startUpFolder2 = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"/Steam/";
+        string startUpFolder2 = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"/Microsoft/Windows/Start Menu/Programs/Steam/";
         string amongUsDirectory = "", steamDir = "", steamappsDir = "";
         if ((Directory.Exists(startUpFolder1) && !Directory.Exists(startUpFolder2)) || (Directory.Exists(startUpFolder1) && Directory.Exists(startUpFolder2)))
         {
