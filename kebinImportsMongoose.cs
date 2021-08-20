@@ -1,20 +1,80 @@
-// Discord: kebin#9844.
+#pragma warning disable CA1416
 
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.IO.Compression;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Net.Http;
+using Microsoft.Win32;
 using SimpleJSON;
-using nWeb;
 using VDF2STR;
-using LNK2Path;
 using static semver.CompareVersions;
 
 class kebinImportsMongoose
 {
-    private static string version = "2.0.1";
+    private static string version = "3.0.0";
+    private static JSONNode jsonNode;
+
+    private static async Task downloadFile(string link, string fileName_Extension)
+    {
+        HttpClientHandler handler = new HttpClientHandler();
+        handler.AllowAutoRedirect = true;
+        HttpClient client = new HttpClient(handler);
+        client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246");
+
+        var response = await client.GetAsync(link);
+        using (var fs = File.Create(fileName_Extension))
+        {
+            await response.Content.CopyToAsync(fs);
+        }
+    }
+
+    private static async Task<string> downloadString(string link)
+    {
+        HttpClientHandler handler = new HttpClientHandler();
+        handler.AllowAutoRedirect = true;
+        HttpClient client = new HttpClient(handler);
+
+        client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246");
+        var response = await client.GetStringAsync(link);
+        return response;
+    }
     static void Main(string[] args)
     {
+        RegistryKey HKLM = Registry.LocalMachine.OpenSubKey("SOFTWARE\\WOW6432Node\\Valve\\Steam");
+        string steamPath = HKLM.GetValue("InstallPath").ToString();
+
+        System.Diagnostics.Process process = new System.Diagnostics.Process();
+        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+        startInfo.FileName = "powershell.exe";
+
+        if (!Directory.Exists(steamPath) || !File.Exists(steamPath + @"/steam.exe"))
+        {
+            Console.WriteLine("Steam has not been found by kebinImportsMongoose!\nPlease contact kebin#9844 to report this issue.");
+            return;
+        }
+
+
+        List<string> steamappsDirs = new List<string>();
+        string appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString().Trim();
+        string appDataLocalDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).ToString().Trim();
+        string kebinImportsMongooseDir = appDataLocalDir + @"/Temp/kebinImportsMongoose/";
+        string kebinImportsMongooseInstallerDir = appDataLocalDir + @"/Temp/kebinImportsMongoose/Installer/";
+        string kebinImportsMongooseDownloadsDir = appDataLocalDir + @"/Temp/kebinImportsMongoose/Downloads/";
+        string amongUsDir = "", downloadLink = "";
+
+        var psi = new System.Diagnostics.ProcessStartInfo
+        {
+            UseShellExecute = true
+        };
+
+        if (Directory.Exists(kebinImportsMongooseDir)) Directory.Delete(kebinImportsMongooseDir, true);
+        Directory.CreateDirectory(kebinImportsMongooseInstallerDir);
+        Directory.CreateDirectory(kebinImportsMongooseDownloadsDir);
+        string bclDir = appDataLocalDir + "/Programs/bettercrewlink/";
+
         Console.Title = "kebinImportsMongoose";
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -28,82 +88,35 @@ class kebinImportsMongoose
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("PLEASE FOLLOW THE INSTRUCTIONS!\n\n");
         Console.ResetColor();
-        newWebClient client = new newWebClient();
-        JSONNode jsonNode;
-        System.Diagnostics.Process process = new System.Diagnostics.Process();
-        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-        startInfo.FileName = "powershell.exe";
-        string appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString().Trim();
-        string appDataLocalDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).ToString().Trim();
-        string kebinImportsMongooseDir = appDataLocalDir + @"/Temp/kebinImportsMongoose/";
-        string kebinImportsMongooseInstallerDir = appDataLocalDir + @"/Temp/kebinImportsMongoose/Installer/";
-        if (Directory.Exists(kebinImportsMongooseDir)) Directory.Delete(kebinImportsMongooseDir, true);
-        Directory.CreateDirectory(kebinImportsMongooseInstallerDir);
-        jsonNode = SimpleJSON.JSON.Parse(client.DownloadString("https://api.github.com/repos/EEkebin/kebinImportsMongoose/releases/latest"));
+
+        jsonNode = JSON.Parse(downloadString("https://api.github.com/repos/EEkebin/kebinImportsMongoose/releases/latest").GetAwaiter().GetResult());
+
         if (compareVersions(version, jsonNode["tag_name"]) == 1)
         {
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("\nUpdating kebinImportsMongoose");
             Console.ResetColor();
-            client.DownloadFile(@"https://github.com/EEkebin/kebinImportsMongoose/releases/latest/download/kebinImportsMongoose.exe", kebinImportsMongooseInstallerDir + @"kebinImportsMongoose.exe");
-            startInfo.Arguments = @"start '" + kebinImportsMongooseInstallerDir + @".\\kebinImportsMongoose.exe'";
-            process.StartInfo = startInfo;
-            Thread.Sleep(1000);
-            process.Start();
-            Environment.Exit(-1);
-        }
-        string startUpFolder1 = Environment.GetFolderPath(Environment.SpecialFolder.Programs) + @"/Steam/";
-        string startUpFolder2 = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"/Microsoft/Windows/Start Menu/Programs/Steam/";
-        string amongUsDirectory = "", steamDir = "", steamappsDir = "";
-        if ((Directory.Exists(startUpFolder1) && !Directory.Exists(startUpFolder2)) || (Directory.Exists(startUpFolder1) && Directory.Exists(startUpFolder2)))
-        {
-            if (File.Exists(startUpFolder1 + @"/Steam.lnk"))
+            for (int i = 0; i < jsonNode["assets"].Count; i++)
             {
-                steamDir = LNK2PATH.GetShortcutTarget(startUpFolder1 + @"/Steam.lnk").Replace("steam.exe", "");
-            }
-            else if (steamDir == "" && File.Exists(startUpFolder2 + @"/Steam.lnk"))
-            {
-                steamDir = LNK2PATH.GetShortcutTarget(startUpFolder2 + @"/Steam.lnk").Replace("steam.exe", "");
-            }
-        }
-        else if ((!Directory.Exists(startUpFolder1) && Directory.Exists(startUpFolder2)) && steamDir == "")
-        {
-            if (File.Exists(startUpFolder2 + @"/Steam.lnk"))
-            {
-                steamDir = LNK2PATH.GetShortcutTarget(startUpFolder2 + @"/Steam.lnk").Replace("steam.exe", "");
-            }
-        }
-        if (steamDir == "" || !File.Exists(steamDir + @"/steam.exe"))
-        {
-            Console.WriteLine("Steam has not been found by kebinImports. Either it is not installed or this is a bug. Please let kebin#9844 know.");
-            Console.ReadKey();
-            Environment.Exit(2);
-        }
-        steamappsDir = steamDir + @"/steamapps/";
-        if (File.Exists(steamappsDir + "libraryfolders.vdf") || !Directory.Exists(amongUsDirectory))
-        {
-            string code = VDFToString.Convert(steamappsDir + "libraryfolders.vdf");
-            jsonNode = JSON.Parse(code);
-            for (int i = 1; i < jsonNode.Count; i++)
-            {
-                string gamesDirs = jsonNode[i]["path"];
-                if (Directory.Exists(gamesDirs + @"/steamapps/common/Among Us/"))
+                if (jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"').ToLower().EndsWith(".exe"))
                 {
-                    amongUsDirectory = gamesDirs + @"/steamapps/common/Among Us/";
+                    downloadLink = jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"');
                 }
             }
-            if (amongUsDirectory == "" || !Directory.Exists(amongUsDirectory)) amongUsDirectory = steamappsDir + @"/common/Among Us/";
-
+            if (downloadLink != null && downloadLink != "")
+            {
+                downloadFile(downloadLink, kebinImportsMongooseInstallerDir + @"kebinImportsMongoose.exe").GetAwaiter().GetResult();
+                startInfo.Arguments = @"start '" + kebinImportsMongooseInstallerDir + @".\\kebinImportsMongoose.exe'";
+                process.StartInfo = startInfo;
+                Thread.Sleep(1000);
+                process.Start();
+                Environment.Exit(-1);
+            }
         }
-        string kebinImportsMongooseDownloadsDir = appDataLocalDir + @"/Temp/kebinImportsMongoose/Downloads/";
-        if (Directory.Exists(kebinImportsMongooseDownloadsDir)) Directory.Delete(kebinImportsMongooseDownloadsDir, true);
-        string bclDir = appDataLocalDir + "/Programs/bettercrewlink/";
-        string downloadLink = "";
-        var psi = new System.Diagnostics.ProcessStartInfo
-        {
-            UseShellExecute = true
-        };
+
+        updatesteamappsLibraries(ref steamPath, ref steamappsDirs);
+
         Console.WriteLine("Press any key to continue ...");
         Console.ReadKey();
         Console.Clear();
@@ -118,7 +131,13 @@ class kebinImportsMongoose
         Console.Write("\n\nType \"y\" when Among Us is completely uninstalled> ");
         Console.ResetColor();
         while (Console.ReadLine().ToLower() != "y") ;
-        if (Directory.Exists(amongUsDirectory)) Directory.Delete(amongUsDirectory, true);
+        for (int i = 0; i < steamappsDirs.Count; i++)
+        {
+            if (Directory.Exists(steamappsDirs[i] + @"/common/Among Us/"))
+            {
+                Directory.Delete(steamappsDirs[i] + @"/common/Among Us/", true);
+            }
+        }
         url = "steam://install/945360";
         psi.FileName = url;
         Console.ForegroundColor = ConsoleColor.Green;
@@ -131,24 +150,16 @@ class kebinImportsMongoose
         Console.Write("\n\nType \"y\" when Among Us is done installing > ");
         Console.ResetColor();
         while (Console.ReadLine().ToLower() != "y") ;
-        if (File.Exists(steamappsDir + "libraryfolders.vdf") || !Directory.Exists(amongUsDirectory))
-        {
-            string code = VDFToString.Convert(steamappsDir + "libraryfolders.vdf");
-            jsonNode = JSON.Parse(code);
-            for (int i = 1; i < jsonNode.Count; i++)
-            {
-                string gamesDirs = jsonNode[i]["path"];
-                if (Directory.Exists(gamesDirs + @"/steamapps/common/Among Us/"))
-                {
-                    amongUsDirectory = gamesDirs + @"/steamapps/common/Among Us/";
-                }
-            }
-            if (amongUsDirectory == "" || !Directory.Exists(amongUsDirectory)) amongUsDirectory = steamappsDir + @"/common/Among Us/";
 
-        }
-        if (Directory.Exists(amongUsDirectory))
+        updatesteamappsLibraries(ref steamPath, ref steamappsDirs);
+
+        for (int i = 0; i < steamappsDirs.Count; i++)
         {
-            System.IO.DirectoryInfo di = new DirectoryInfo(amongUsDirectory);
+            if (Directory.Exists(steamappsDirs[i] + @"/common/Among Us/")) amongUsDir = steamappsDirs[i] + @"/common/Among Us/";
+        }
+        if (Directory.Exists(amongUsDir))
+        {
+            System.IO.DirectoryInfo di = new DirectoryInfo(amongUsDir);
             foreach (FileInfo file in di.GetFiles())
             {
                 file.Delete();
@@ -168,6 +179,7 @@ class kebinImportsMongoose
             Thread.Sleep(3000);
             Environment.Exit(1);
         }
+
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("\n\nWhich mod would you like to install?\n-------------------------------------");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
@@ -184,15 +196,16 @@ class kebinImportsMongoose
                 selectedModString = Console.ReadLine();
             } while (Int32.TryParse(selectedModString, out selectedMod) == false);
         } while (selectedMod < 1 || selectedMod > 3);
+
         if (selectedMod == 1)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("\n\nInstalling Town Of Us.");
             Console.ResetColor();
-            jsonNode = SimpleJSON.JSON.Parse(client.DownloadString("https://api.github.com/repos/polusgg/Town-Of-Us/releases/latest"));
+            jsonNode = SimpleJSON.JSON.Parse(downloadString("https://api.github.com/repos/polusgg/Town-Of-Us/releases/latest").GetAwaiter().GetResult());
             for (int i = 0; i < jsonNode["assets"].Count; i++)
             {
-                if (jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"').EndsWith(".zip"))
+                if (jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"').ToLower().EndsWith(".zip"))
                 {
                     downloadLink = jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"');
                 }
@@ -203,10 +216,10 @@ class kebinImportsMongoose
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("\n\nInstalling Town Of Imposters.");
             Console.ResetColor();
-            jsonNode = SimpleJSON.JSON.Parse(client.DownloadString("https://api.github.com/repos/Town-of-Impostors/TownOfImpostors/releases/latest"));
+            jsonNode = SimpleJSON.JSON.Parse(downloadString("https://api.github.com/repos/Town-of-Impostors/TownOfImpostors/releases/latest").GetAwaiter().GetResult());
             for (int i = 0; i < jsonNode["assets"].Count; i++)
             {
-                if (jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"').EndsWith(".zip"))
+                if (jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"').ToLower().EndsWith(".zip"))
                 {
                     downloadLink = jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"');
                 }
@@ -217,18 +230,18 @@ class kebinImportsMongoose
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("\n\nInstalling The Other Roles.");
             Console.ResetColor();
-            jsonNode = SimpleJSON.JSON.Parse(client.DownloadString("https://api.github.com/repos/Eisbison/TheOtherRoles/releases/latest"));
+            jsonNode = SimpleJSON.JSON.Parse(downloadString("https://api.github.com/repos/Eisbison/TheOtherRoles/releases/latest").GetAwaiter().GetResult());
             for (int i = 0; i < jsonNode["assets"].Count; i++)
             {
-                if (jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"').EndsWith(".zip"))
+                if (jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"').ToLower().EndsWith(".zip"))
                 {
                     downloadLink = jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"');
                 }
             }
         }
         Directory.CreateDirectory(kebinImportsMongooseDownloadsDir);
-        client.DownloadFile(downloadLink, kebinImportsMongooseDownloadsDir + @"MOD.zip");
-        ZipFile.ExtractToDirectory(kebinImportsMongooseDownloadsDir + @"MOD.zip", amongUsDirectory);
+        downloadFile(downloadLink, kebinImportsMongooseDownloadsDir + @"MOD.zip").GetAwaiter().GetResult();
+        ZipFile.ExtractToDirectory(kebinImportsMongooseDownloadsDir + @"MOD.zip", amongUsDir);
         Thread.Sleep(2000);
         url = "steam://validate/945360";
         psi.FileName = url;
@@ -247,7 +260,7 @@ class kebinImportsMongoose
             Console.ResetColor();
             if (Directory.Exists(appDataLocalDir + "/bettercrewlink-updater/")) Directory.Delete(appDataLocalDir + "/bettercrewlink-updater/", true);
             if (Directory.Exists(appDataDir + "/bettercrewlink/")) Directory.Delete(appDataDir + "/bettercrewlink/", true);
-            jsonNode = JSON.Parse(client.DownloadString("https://api.github.com/repos/OhMyGuus/BetterCrewLink/releases/latest"));
+            jsonNode = JSON.Parse(downloadString("https://api.github.com/repos/OhMyGuus/BetterCrewLink/releases/latest").GetAwaiter().GetResult());
             for (int i = 0; i < jsonNode["assets"].Count; i++)
             {
                 if (jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"').EndsWith(".exe"))
@@ -255,7 +268,7 @@ class kebinImportsMongoose
                     downloadLink = jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"');
                 }
             }
-            client.DownloadFile(downloadLink, kebinImportsMongooseDownloadsDir + @"BCL.exe");
+            downloadFile(downloadLink, kebinImportsMongooseDownloadsDir + @"BCL.exe").GetAwaiter().GetResult();
             startInfo.Arguments = @"start '" + kebinImportsMongooseDownloadsDir + @".\\BCL.exe'";
         }
         else
@@ -273,5 +286,28 @@ class kebinImportsMongoose
         Console.ResetColor();
         Console.WriteLine("\nPress any key to exit ...");
         Console.ReadKey();
+    }
+
+    private static void updatesteamappsLibraries(ref string steamPath, ref List<string> steamappsDirs)
+    {
+        steamappsDirs.Add(steamPath + @"/steamapps/");
+        if (File.Exists(steamPath + @"/steamapps/libraryfolders.vdf"))
+        {
+            jsonNode = JSON.Parse(VDFToString.Convert(steamPath + @"/steamapps/libraryfolders.vdf"));
+            for (int i = 0; i < jsonNode.Count; i++)
+            {
+                if (Directory.Exists(jsonNode[i].ToString().Trim('\"') + @"/steamapps/"))
+                {
+                    steamappsDirs.Add(jsonNode[i].ToString().Trim('\"') + @"/steamapps/");
+                }
+                for (int j = 0; j < jsonNode[i].Count; j++)
+                {
+                    if (Directory.Exists(jsonNode[i][j].ToString().Trim('\"') + @"/steamapps/"))
+                    {
+                        steamappsDirs.Add(jsonNode[i][j].ToString().Trim('\"') + @"/steamapps/");
+                    }
+                }
+            }
+        }
     }
 }
