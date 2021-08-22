@@ -14,7 +14,7 @@ using static semver.CompareVersions;
 
 class kebinImportsMongoose
 {
-    private static string version = "3.0.1";
+    private static string version = "3.0.2";
     private static JSONNode jsonNode;
 
     private static async Task downloadFile(string link, string fileName_Extension)
@@ -56,10 +56,10 @@ class kebinImportsMongoose
             return;
         }
 
-
         List<string> steamappsDirs = new List<string>();
         string appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString().Trim();
         string appDataLocalDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData).ToString().Trim();
+        string bclDir = appDataLocalDir + "/Programs/bettercrewlink/";
         string kebinImportsMongooseDir = appDataLocalDir + @"/Temp/kebinImportsMongoose/";
         string kebinImportsMongooseInstallerDir = appDataLocalDir + @"/Temp/kebinImportsMongoose/Installer/";
         string kebinImportsMongooseDownloadsDir = appDataLocalDir + @"/Temp/kebinImportsMongoose/Downloads/";
@@ -70,10 +70,17 @@ class kebinImportsMongoose
             UseShellExecute = true
         };
 
-        if (Directory.Exists(kebinImportsMongooseDir)) Directory.Delete(kebinImportsMongooseDir, true);
+        if (Directory.Exists(kebinImportsMongooseDir))
+        {
+            try
+            {
+                Directory.Delete(kebinImportsMongooseDir, true);
+            }
+            catch { }
+        }
+
         Directory.CreateDirectory(kebinImportsMongooseInstallerDir);
         Directory.CreateDirectory(kebinImportsMongooseDownloadsDir);
-        string bclDir = appDataLocalDir + "/Programs/bettercrewlink/";
 
         Console.Title = "kebinImportsMongoose";
         Console.Clear();
