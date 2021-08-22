@@ -263,7 +263,7 @@ class kebinImportsMongoose
             jsonNode = JSON.Parse(downloadString("https://api.github.com/repos/OhMyGuus/BetterCrewLink/releases/latest").GetAwaiter().GetResult());
             for (int i = 0; i < jsonNode["assets"].Count; i++)
             {
-                if (jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"').EndsWith(".exe"))
+                if (jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"').ToLower().EndsWith(".exe"))
                 {
                     downloadLink = jsonNode["assets"][i]["browser_download_url"].ToString().Trim('\"');
                 }
@@ -280,6 +280,7 @@ class kebinImportsMongoose
         }
         process.StartInfo = startInfo;
         process.Start();
+        process.CloseMainWindow();
         Thread.Sleep(3000);
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("\n\nThanks for using kebin's AutoModInstaller for Among Us, Town Of Us or Town Of Imposters, and BetterCrewLink.\nShow him support by being nice! :'(");
