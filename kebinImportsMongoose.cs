@@ -14,7 +14,7 @@ using static semver.CompareVersions;
 
 class kebinImportsMongoose
 {
-    private static string version = "3.0.0";
+    private static string version = "3.0.1";
     private static JSONNode jsonNode;
 
     private static async Task downloadFile(string link, string fileName_Extension)
